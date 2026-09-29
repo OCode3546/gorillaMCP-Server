@@ -41,6 +41,8 @@ The endpoint is `http://127.0.0.1:8000/mcp`. The server has **no authentication*
 .venv/bin/python mcp_client.py --call run_agent_tool --arg agent_name=file-sorter-agent --arg goal='Sort files' --arg targets='["agent-builder"]'
 ```
 
-## Copyright
+## License
 
-Copyright 2026 By Orville Arrindell. All rights reserved.
+Copyright (c) 2026 Orville Arrindell. All rights reserved.
+
+Free for personal and other non-commercial use. Commercial use requires written permission; contact <Orville@codegorilla.nl>. See [LICENSE](LICENSE) for the full terms.
