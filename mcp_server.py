@@ -191,7 +191,7 @@ def build_server_manifest() -> dict[str, Any]:
 def _build_task(goal: str, targets: list[str] | None, extra: dict[str, Any] | None) -> dict[str, Any]:
     # MCP clients (e.g. Claude Desktop) may launch the server from any cwd, so
     # relative targets are anchored to the workspace root instead.
-    resolved = [str((PROMPTS_ROOT / t).resolve()) for t in (targets or [])]
+    resolved = [str((PROMPTS_ROOT / Path(t).expanduser()).resolve()) for t in (targets or [])]
     task: dict[str, Any] = {"goal": goal or "No goal provided", "targets": resolved}
     if extra:
         task.update(extra)
@@ -217,7 +217,13 @@ def run_agent_tool(agent_name: str, goal: str, targets: list[str] | None = None,
     Agent-specific fields go in `extra`:
     - code-errors-agent: needs at least one of error_message, stack_trace, code_snippet;
       optional test_command (a shell command run to verify), reproduce_steps, expected_behavior.
-    - file-sorter-agent: optional sort_by ("type", "size" or "date").
+    - file-sorter-agent: mode ("plan" = dry run, the default; "apply" moves files; "undo" reverts
+      the latest apply, or pass manifest=<id>; "history" lists applied runs). Optional sort_by
+      ("type", "extension", "size", "date", "month", "year"), destination (absolute or ~ path),
+      recursive, include/exclude globs, rules ([{"pattern"|"extensions"|"name_contains": ..., "folder": ...}]),
+      categories, conflict ("rename", "skip", "overwrite"), copy, find_duplicates,
+      duplicates_action ("report", "move"), remove_empty_dirs, force (required to apply inside a git repo).
+      Always run a plan first and show it to the user before applying.
     """
     return invoke_agent(agent_name, _build_task(goal, targets, extra))
 

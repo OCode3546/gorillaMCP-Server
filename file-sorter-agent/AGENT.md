@@ -1,39 +1,48 @@
 # Agent: File Sorter — MCP Compatible
 
-**Purpose:** Intelligently categorizes, organizes, and sorts files in a workspace based on type, size, date, or custom criteria. Generates organization reports and optional file move operations.
+**Purpose:** Categorizes files by type, extension, size, date or custom rules and moves (or copies) them into folders. Dry run by default; every applied sort can be undone.
 
 **Capabilities:**
-- Sort files by type (code, docs, media, config, etc.)
-- Organize by date modified (today, this week, this month, etc.)
-- Group by file size (small, medium, large)
-- Generate organization reports
-- Create suggested folder structure
-- Identify duplicate files
-- Find orphaned or unused files
-- Custom sorting rules
+- Plan (dry run) → apply → undo workflow, with a manifest recorded for every applied run
+- Sort by type (images, videos, audio, documents, code, installers, …), extension, size, relative date, month or year
+- Custom pattern rules (`Screenshot*` → `Screenshots/`) and custom categories
+- Include/exclude globs, recursive or top-level only, optional separate destination
+- Name conflicts renamed (`file (1).pdf`), skipped, or overwritten
+- Copy instead of move
+- Duplicate detection by content hash (report, or move extras to `duplicates/`)
+- Removes folders left empty by the sort
+- Safety: skips `.git`, virtualenvs, `node_modules`, hidden files, app bundles and partial downloads; refuses system paths; won't apply inside a git repo without `force`
 
 **Entrypoint:** `run_agent.py` with `run(task: dict) -> dict` function
 
 **Task Schema:**
 ```json
 {
-  "goal": "Sort files in src/ by type and organize into folders",
-  "targets": ["src/", "public/"],
-  "sort_by": "type|date|size",
-  "generate_report": true,
-  "create_structure": true,
-  "rules": {
-    "group_by_extension": true,
-    "create_subfolders": true,
-    "pattern_rules": [...]
-  }
+  "goal": "Sort my Downloads folder",
+  "targets": ["~/Downloads"],
+  "mode": "plan|apply|undo|history",
+  "sort_by": "type|extension|size|date|month|year",
+  "destination": "~/Sorted",
+  "recursive": true,
+  "include": ["*.pdf"],
+  "exclude": ["keep-*"],
+  "rules": [{"pattern": "Screenshot*", "folder": "Screenshots"}],
+  "categories": {"invoices": [".pdf"]},
+  "conflict": "rename|skip|overwrite",
+  "copy": false,
+  "find_duplicates": true,
+  "duplicates_action": "report|move",
+  "remove_empty_dirs": true,
+  "force": false,
+  "manifest": "file-sort-20260929-111818-cd234b"
 }
 ```
 
 **Returns:**
-- Status (success/failed)
-- Summary of organization
-- File groups and statistics
+- Status (success / partial-success / failed) and mode
+- Summary, groups and per-status counts
+- Operations (src → dst with status)
+- Duplicate groups
 - Organization report
-- Suggested folder structure
-- Optional: patch file with mv commands
+- Plan: shell script artifact in `outgoing_patches/`
+- Apply: undo manifest in `move_history/`

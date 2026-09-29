@@ -1,294 +1,216 @@
 # File Sorter Agent — Complete Guide
 
-A specialized MCP agent that intelligently categorizes, organizes, and sorts files in your workspace. Perfect for organizing code repositories, managing documentation, and understanding project structure.
+An MCP agent that categorizes files and **actually moves them** into organized folders. It is safe by default: every run is a dry run until you ask it to apply, and every applied run can be undone.
 
 ## 🎯 What It Does
 
-- **Categorizes files** by type (code, docs, media, configs, etc.)
-- **Sorts by criteria**: file type, modification date, or file size
-- **Generates reports**: detailed analysis of file organization
-- **Creates suggestions**: folder structure and organization recommendations
-- **Identifies patterns**: helps optimize workspace layout
+- **Plans** where every file should go (dry run, nothing touched)
+- **Moves or copies** files into category folders when you apply
+- **Undoes** any applied sort from its recorded manifest
+- **Sorts by** type, extension, size, relative date, month, or year
+- **Custom rules**: `Screenshot*` → `Screenshots/`, `invoice*.pdf` → `Finance/Invoices/`
+- **Finds duplicates** by content hash, and can move extra copies to `duplicates/`
+- **Cleans up** folders left empty after the move
+- **Reports** size and file-count breakdowns per folder
 
-## 📋 File Categories
-
-The agent recognizes these file types:
-
-| Category | Extensions | Examples |
-|----------|-----------|----------|
-| **Code** | .py, .js, .ts, .java, .cpp, etc. | Python, JavaScript, TypeScript |
-| **Markup** | .html, .md, .xml, .tex | HTML, Markdown, XML |
-| **Config** | .json, .yaml, .env, .toml | Configuration files |
-| **Style** | .css, .scss, .less | Stylesheets |
-| **Data** | .csv, .xlsx, .db, .sql | Data files |
-| **Media** | .jpg, .mp4, .mp3, .wav | Images and media |
-| **Document** | .pdf, .doc, .txt | Documents |
-| **Archive** | .zip, .tar, .gz | Compressed files |
-| **Executable** | .exe, .sh, .app | Executable files |
-| **Other** | Everything else | Unknown types |
-
-## 🚀 Quick Start
-
-### Basic Usage
+## 🔁 Workflow: plan → apply → undo
 
 ```bash
-# Sort all files in src/ by type
-python ~/Library/Application\ Support/Code/User/prompts/file-sorter-agent/run_agent.py \
-  --task-json '{"goal":"Sort files by type","targets":["src/"],"sort_by":"type"}'
+cd file-sorter-agent
+
+# 1. Dry run — shows what would move and writes a reviewable script
+python run_agent.py --task-json '{"targets":["~/Downloads"],"recursive":false}'
+
+# 2. Apply — really moves the files and records an undo manifest
+python run_agent.py --task-json '{"targets":["~/Downloads"],"recursive":false}' --apply
+
+# 3. Changed your mind? Undo the latest applied sort
+python run_agent.py --undo
+
+# List previous applied sorts (to undo a specific one: --undo <id>)
+python run_agent.py --history
 ```
 
-### Via MCP Server
+Result for a typical Downloads folder:
 
-```bash
-# Using the MCP server tools
-python mcp_server.py run_agent_tool file-sorter-agent \
-  "Organize files in src/" \
-  --targets='["src/"]'
+```text
+Downloads/
+├── archives/       project.zip
+├── documents/      report.pdf, notes.txt
+├── images/         photo.jpg, photo (1).jpg
+├── installers/     Setup.dmg
+├── Screenshots/    Screenshot 2026-09-29.png   ← custom rule
+└── videos/         clip.mov
 ```
+
+## 📋 File Categories (`sort_by: "type"`)
+
+| Folder | Extensions |
+|--------|-----------|
+| **images** | .jpg .jpeg .png .gif .svg .webp .heic .psd … |
+| **videos** | .mp4 .mov .avi .mkv .webm … |
+| **audio** | .mp3 .wav .flac .aac .m4a … |
+| **documents** | .pdf .doc .docx .txt .rtf .pages .epub |
+| **spreadsheets** | .xlsx .xls .numbers .ods |
+| **presentations** | .ppt .pptx .key .odp |
+| **code** | .py .js .ts .java .go .rs .swift .ipynb … |
+| **markup** | .html .xml .md .tex .rst |
+| **config** | .json .yaml .toml .ini .env .plist |
+| **style** | .css .scss .sass .less |
+| **data** | .csv .tsv .db .sqlite .sql .parquet |
+| **archives** | .zip .tar .gz .7z .rar |
+| **installers** | .dmg .pkg .msi .deb .iso |
+| **fonts** | .ttf .otf .woff .woff2 |
+| **executables** | .exe .sh .bat .command |
+| **other** | everything else |
+
+Add or override categories with `"categories": {"invoices": [".pdf"]}`. Custom categories are checked first.
 
 ## 📊 Task Schema
 
 ```json
 {
-  "goal": "Organize and analyze files",
-  "targets": ["src/", "public/"],
-  "sort_by": "type|date|size",
-  "generate_report": true,
-  "create_structure": true,
-  "rules": {
-    "group_by_extension": true,
-    "create_subfolders": true,
-    "pattern_rules": []
-  }
+  "goal": "Sort my Downloads folder",
+  "targets": ["~/Downloads"],
+  "mode": "plan",
+  "sort_by": "type",
+  "destination": null,
+  "recursive": true,
+  "include": [],
+  "exclude": [],
+  "include_hidden": false,
+  "rules": [{"pattern": "Screenshot*", "folder": "Screenshots"}],
+  "categories": {},
+  "conflict": "rename",
+  "copy": false,
+  "find_duplicates": false,
+  "duplicates_action": "report",
+  "remove_empty_dirs": false,
+  "force": false
 }
 ```
 
 ### Parameters
 
-- **goal** (string): What you want to accomplish
-- **targets** (list): Directories/files to analyze
-- **sort_by** (string): Sort criterion - "type", "date", or "size"
-- **generate_report** (bool): Generate text report
-- **create_structure** (bool): Suggest folder structure
+| Field | Default | Meaning |
+|-------|---------|---------|
+| **targets** | `["."]` | Folders (or single files) to sort |
+| **mode** | `"plan"` | `plan` (dry run), `apply` (move files), `undo`, `history`. `"apply": true` also works |
+| **sort_by** | `"type"` | `type`, `extension`, `size` (small/medium/large), `date` (today/this_week/…), `month` (`2026-09`), `year` |
+| **destination** | each target | Root folder for the sorted folders. Use an absolute or `~` path |
+| **recursive** | `true` | Also sort files in subfolders. Use `false` to sort only the top level |
+| **include** / **exclude** | `[]` | Glob patterns matched against file name or relative path, e.g. `["*.pdf"]`, `["Projects/*"]` |
+| **include_hidden** | `false` | Include dotfiles and dot-folders |
+| **rules** | `[]` | Checked before `sort_by`, first match wins. Each rule has a `folder` plus any of `pattern` (glob), `extensions`, `name_contains`. Every condition given must match. `folder` may be nested: `"Finance/Invoices"` |
+| **categories** | `{}` | Extra type categories: `{"folder": [".ext", …]}` |
+| **conflict** | `"rename"` | When the destination exists: `rename` → `name (1).ext`, `skip`, or `overwrite` |
+| **copy** | `false` | Copy instead of move (originals stay put) |
+| **find_duplicates** | `false` | Hash file contents and report duplicate groups (the oldest copy is kept) |
+| **duplicates_action** | `"report"` | `move` sends extra copies to `duplicates/` instead of their category |
+| **remove_empty_dirs** | `false` | After moving, delete subfolders that are now empty |
+| **force** | `false` | Required to apply inside a git repository |
+| **manifest** | latest | For `undo`: run id or path of the manifest to revert |
 
-## Use Cases
+## 🛡️ Safety
 
-### 1. Organize a New Project
+- **Dry run by default.** Nothing moves unless `mode` is `apply`.
+- **Never overwrites** unless you set `conflict: "overwrite"`. Clashing names become `file (1).ext`, including two files from the same run.
+- **Undo manifest.** Every applied run writes `move_history/<id>.json`. `undo` moves files back, restores removed folders, deletes folders the sort created, and refuses to undo twice. If a file's original spot is occupied by then, it is left where it is and reported.
+- **Always skipped:** `.git`, `.venv`/`venv`, `node_modules`, `__pycache__` and other caches, hidden files, `.DS_Store`, app bundles (`.app`, `.photoslibrary`, …), symlinks, and partial downloads (`.crdownload`, `.part`, …).
+- **Idempotent.** Files already inside their target folder are left alone, so running the same sort twice moves nothing.
+- **Refused locations:** `/`, `/System`, `/Library`, `/Applications`, `/Users`, and a recursive sort of your whole home folder.
+- **Git guard.** Applying inside a git repository fails unless `force: true`. Moving source files breaks code.
+
+## 🔌 Via MCP
+
+The `workspace-agent-registry` server exposes this agent through `run_agent_tool`. Put agent options in `extra`:
+
 ```json
 {
-  "goal": "Set up organized folder structure for new project",
-  "targets": ["./"],
-  "sort_by": "type"
+  "agent_name": "file-sorter-agent",
+  "goal": "Sort my Downloads folder",
+  "targets": ["~/Downloads"],
+  "extra": {"mode": "plan", "recursive": false, "find_duplicates": true}
 }
 ```
 
-**Output:** Categorizes all files by type and suggests folder creation
+Review the plan, then repeat with `"mode": "apply"`. To revert: `{"extra": {"mode": "undo"}}`.
 
-### 2. Find Large Files Taking Up Space
+## 🗂️ Recipes
+
+### Downloads cleanup with screenshots and duplicates
 ```json
 {
-  "goal": "Identify large files to optimize",
-  "targets": ["./"],
-  "sort_by": "size"
+  "targets": ["~/Downloads"],
+  "recursive": false,
+  "rules": [{"pattern": "Screenshot*", "folder": "Screenshots"}],
+  "duplicates_action": "move",
+  "mode": "apply"
 }
 ```
 
-**Output:** Groups files by size (small, medium, large) with statistics
-
-### 3. Identify Recently Modified Files
+### Photos into year/month folders, copied to a new location
 ```json
 {
-  "goal": "Find files modified recently for backup",
-  "targets": ["src/", "config/"],
-  "sort_by": "date"
+  "targets": ["~/Pictures/Import"],
+  "include": ["*.jpg", "*.jpeg", "*.heic", "*.png", "*.mov"],
+  "sort_by": "month",
+  "destination": "~/Pictures/Sorted",
+  "copy": true,
+  "mode": "apply"
 }
 ```
 
-**Output:** Groups by modification date (today, this week, this month, etc.)
-
-### 4. Analyze Media Files
+### Invoices into a finance folder, everything else by extension
 ```json
 {
-  "goal": "Organize media assets",
-  "targets": ["assets/", "public/media/"],
-  "sort_by": "type"
+  "targets": ["~/Documents/Inbox"],
+  "sort_by": "extension",
+  "rules": [{"name_contains": ["invoice", "factuur"], "extensions": ["pdf"], "folder": "Finance/Invoices"}]
 }
 ```
 
-**Output:** Categorizes images, videos, audio files
+### Flatten nested folders and clean up the empties
+```json
+{
+  "targets": ["~/Desktop/Dump"],
+  "remove_empty_dirs": true,
+  "mode": "apply"
+}
+```
+
+### Analysis only: what is using space?
+```json
+{"targets": ["./"], "sort_by": "size", "find_duplicates": true}
+```
 
 ## 📈 Output Format
-
-The agent returns detailed analysis:
 
 ```json
 {
   "status": "success",
-  "summary": "Analyzed 150 files across 8 categories. Total size: 45.32 MB",
-  "files_found": 150,
-  "total_size_mb": 45.32,
-  "groups": {
-    "code": 42,
-    "config": 18,
-    "media": 35,
-    "document": 12,
-    "other": 43
-  },
-  "report": "[Full text report]",
-  "suggestions": ["mkdir -p './code'", "mkdir -p './config'", ...],
-  "artifacts": ["file-sort-abc12345.patch"]
+  "mode": "apply",
+  "summary": "Moved 7 of 8 files into 6 folders (1 already sorted, 0 skipped, 0 errors). Undo with mode='undo'.",
+  "files_found": 8,
+  "total_size_mb": 12.4,
+  "groups": {"images": 3, "documents": 1, "Screenshots": 1},
+  "counts": {"moved": 7, "in_place": 1},
+  "operations": [{"src": ".../photo.jpg", "dst": ".../images/photo (1).jpg", "folder": "images", "status": "moved"}],
+  "duplicates": [{"keep": ".../photo.jpg", "duplicates": [".../photo copy.jpg"], "wasted_bytes": 204800}],
+  "report": "[text report]",
+  "suggestions": ["mkdir -p ...", "mv -n ... ..."],
+  "manifest": ".../move_history/file-sort-20260929-111818-cd234b.json",
+  "artifacts": [".../move_history/file-sort-20260929-111818-cd234b.json"],
+  "warnings": [],
+  "errors": []
 }
 ```
 
-### Fields
-
-- **status**: "success" or "failed"
-- **summary**: High-level overview
-- **files_found**: Total number of files
-- **total_size_mb**: Total disk usage
-- **groups**: Count per category
-- **report**: Formatted text report
-- **suggestions**: Shell commands to create structure
-- **artifacts**: Patch file with move commands
-
-## 📝 Sample Report Output
-
-```
-======================================================================
-FILE ORGANIZATION REPORT
-======================================================================
-Total files: 150
-Sorted by: type
-
-BREAKDOWN:
-
-📁 CODE
-   Files:   42 | Size:    25.30 MB | 55.8%
-     - app.py (2.3 KB)
-     - utils.py (4.1 KB)
-     - models.py (8.7 KB)
-     ... and 39 more files
-
-📁 CONFIG
-   Files:   18 | Size:     0.45 MB |  1.0%
-     - package.json (1.2 KB)
-     - .env (0.3 KB)
-     ... and 16 more files
-
-📁 MEDIA
-   Files:   35 | Size:    15.20 MB | 33.5%
-     - logo.png (250 KB)
-     - banner.jpg (1.5 MB)
-     ... and 33 more files
-
-📁 DOCUMENT
-   Files:   12 | Size:     3.60 MB |  7.9%
-     - README.md (5.2 KB)
-     - CONTRIBUTING.md (3.1 KB)
-     ... and 10 more files
-
-📁 OTHER
-   Files:   43 | Size:     0.77 MB |  1.7%
-
-======================================================================
-Total Size: 45.32 MB
-======================================================================
-```
-
-## 🔧 Advanced Examples
-
-### Custom Sorting in CI/CD Pipeline
-```bash
-# Analyze workspace before deployment
-python mcp_server.py run_agent_tool file-sorter-agent \
-  "Pre-deployment file check" \
-  --targets='["src/", "dist/"]' \
-  --extra='{"sort_by":"size"}'
-```
-
-### Find Duplicates
-```json
-{
-  "goal": "Identify potential duplicate files",
-  "targets": ["src/", "tests/", "docs/"],
-  "sort_by": "type"
-}
-```
-
-Then review grouped files to spot duplicates by name.
-
-## ✨ Real-World Scenarios
-
-### Scenario 1: New Developer Joining Project
-Developer wants to understand project structure:
-```bash
-python mcp_server.py run_agent_tool file-sorter-agent \
-  "Help me understand this project structure" \
-  --targets='["./"]'
-```
-
-Result: Clear breakdown of file types, what goes where, project size.
-
-### Scenario 2: Storage Analysis
-Need to clean up and free disk space:
-```bash
-python mcp_server.py run_agent_tool file-sorter-agent \
-  "Find what's using most disk space" \
-  --targets='["./"]' \
-  --extra='{"sort_by":"size"}'
-```
-
-Result: Large files grouped for cleanup decisions.
-
-### Scenario 3: Project Migration
-Migrating from monolith to modular structure:
-```bash
-python mcp_server.py run_agent_tool file-sorter-agent \
-  "Suggest folder structure for modular project" \
-  --targets='["src/"]' \
-  --extra='{"sort_by":"type","create_structure":true}'
-```
-
-Result: Organized structure suggestion with mkdir commands.
-
-## 🎓 Tips & Tricks
-
-1. **Combine with other agents**: Use results as input for code-errors agent
-2. **Batch operations**: Run on multiple directories
-3. **Automation**: Include in CI/CD pipelines for pre-deployment checks
-4. **Reports**: Generate for documentation or team onboarding
-5. **Size optimization**: Identify bloated directories
-
-## 🔗 Integration with Other Agents
-
-The File Sorter Agent works great with:
-- **Code-Errors Agent**: Analyze errors in sorted code categories
-- **Agent-Builder**: Use organization reports as build input
-- **Manager Agent**: Route file organization tasks intelligently
-
-## 📞 Output Usage
-
-### Artifacts
-The patch file contains shell commands to create suggested structure:
-```bash
-# Run the suggested commands
-bash < file-sort-abc12345.patch
-```
-
-### Reports
-Use in documentation:
-```bash
-# Extract just the report
-python ... | jq -r '.report'
-```
-
-### Integration
-Export for tooling:
-```bash
-# Get JSON for processing
-python ... | jq '.groups' # Get group breakdown
-```
+- **status**: `success`, `partial-success` (some operations failed), or `failed`
+- **counts**: operations per status: `planned`, `moved`, `copied`, `in_place`, `skipped`, `error`
+- **operations**: up to 200 non-trivial operations with source, destination and status
+- **artifacts**: for a plan, a `.sh` script in `outgoing_patches/` (`mv -n` commands, safely quoted). For an apply, the undo manifest
 
 ---
 
-**Ready to organize?** Use any of the examples above to get started!
+**Tip:** Always look at the plan first. It is free, and the summary tells you exactly how many files will move where.
