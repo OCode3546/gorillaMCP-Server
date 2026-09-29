@@ -1,0 +1,28 @@
+{
+  "title": "React web app (Vite)",
+  "category": "web",
+  "description": "React single-page app on Vite with hot reload, component structure, a custom localStorage hook and a production build to dist/.",
+  "stack": ["React", "Vite", "JavaScript"],
+  "produces": ["Static production bundle in dist/ for any host (Vercel, Netlify, GitHub Pages)"],
+  "requires": ["node", "npm"],
+  "priority": 15,
+  "default_name": "my-react-app",
+  "keywords": ["react", "vite", "spa", "single page", "single-page", "frontend", "front-end"],
+  "hints": ["web app", "webapp", "dashboard", "javascript", "typescript", "components", "ui", "interactive", "portal"],
+  "run": [
+    "cd __APP_NAME__ && npm install",
+    "npm run dev   then open the printed http://localhost:5173 URL"
+  ],
+  "build": ["Build mode runs npm install and npm run build; the site is written to dist/"],
+  "customize": [
+    "src/App.jsx: the top-level layout and state",
+    "src/components/: add components here (ItemList.jsx is an example)",
+    "src/useLocalStorage.js: persisted state hook; replace with fetch() calls for a backend",
+    "src/index.css: colour tokens in :root (light + dark)"
+  ],
+  "build_steps": [
+    {"name": "Install dependencies", "cmd": ["{npm}", "install", "--no-audit", "--no-fund"]},
+    {"name": "Production build", "cmd": ["{npm}", "run", "build"]}
+  ],
+  "build_outputs": ["dist/index.html"]
+}

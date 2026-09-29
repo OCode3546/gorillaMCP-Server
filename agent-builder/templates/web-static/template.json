@@ -1,0 +1,24 @@
+{
+  "title": "Static web app (HTML/CSS/JS)",
+  "category": "web",
+  "description": "Zero-dependency web app: open index.html or serve the folder. Includes a working task list with local storage, dark mode and responsive layout.",
+  "stack": ["HTML", "CSS", "JavaScript"],
+  "produces": ["Static site deployable to any host (GitHub Pages, Netlify, S3)"],
+  "requires": [],
+  "priority": 10,
+  "default_name": "my-web-app",
+  "keywords": ["website", "web site", "web page", "webpage", "landing page", "static site", "portfolio", "html"],
+  "hints": ["web", "web app", "webapp", "page", "todo", "to-do", "tracker", "list", "notes", "calculator", "form"],
+  "run": [
+    "Open __APP_NAME__/index.html in a browser",
+    "Or serve it: cd __APP_NAME__ && python3 -m http.server 8080, then open http://localhost:8080"
+  ],
+  "build": ["No build step: deploy the folder as-is."],
+  "customize": [
+    "index.html: page structure and copy",
+    "styles.css: colour tokens live in :root at the top (light and dark)",
+    "app.js: state lives in `state`, persisted by save(); render() redraws the list"
+  ],
+  "build_steps": [],
+  "build_outputs": []
+}

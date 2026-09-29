@@ -1,0 +1,31 @@
+{
+  "name": "__APP_NAME__",
+  "productName": "__APP_TITLE__",
+  "version": "0.1.0",
+  "description": "__APP_DESCRIPTION__",
+  "author": "__APP_TITLE__ developers",
+  "license": "UNLICENSED",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --publish never",
+    "dist:win": "electron-builder --win --publish never",
+    "dist:mac": "electron-builder --mac --publish never",
+    "dist:linux": "electron-builder --linux --publish never"
+  },
+  "devDependencies": {
+    "electron": "^44.4.5",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "__APP_ID__",
+    "productName": "__APP_TITLE__",
+    "directories": { "output": "release" },
+    "files": ["main.js", "preload.js", "src/**/*", "package.json"],
+    "win": { "target": ["nsis", "portable"] },
+    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true },
+    "portable": { "artifactName": "${productName}-${version}-portable.${ext}" },
+    "mac": { "target": ["dmg"], "category": "public.app-category.productivity" },
+    "linux": { "target": ["AppImage"], "category": "Utility" }
+  }
+}

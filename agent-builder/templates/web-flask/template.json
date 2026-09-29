@@ -1,0 +1,29 @@
+{
+  "title": "Full-stack web app (Python Flask + SQLite)",
+  "category": "web",
+  "description": "Flask server with a JSON REST API backed by SQLite, a server-rendered page with vanilla JS front end, and tests. Good base for dashboards, internal tools and CRUD apps.",
+  "stack": ["Python", "Flask", "SQLite", "JavaScript"],
+  "produces": ["Web server app deployable to any Python host (Render, Fly.io, a VPS with gunicorn)"],
+  "requires": ["python3"],
+  "priority": 60,
+  "default_name": "my-web-app",
+  "keywords": ["flask", "python web", "full stack", "full-stack", "fullstack", "web server", "crud"],
+  "hints": ["web app", "webapp", "python", "server", "database", "sqlite", "backend", "login", "admin", "dashboard", "inventory", "booking"],
+  "run": [
+    "cd __APP_NAME__ && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt",
+    ".venv/bin/flask --app app run --debug   then open http://127.0.0.1:5000"
+  ],
+  "build": ["Build mode creates .venv, installs Flask and runs the tests. Deploy with: gunicorn 'app:create_app()'"],
+  "customize": [
+    "app.py SCHEMA: the database table(s)",
+    "app.py create_app(): API routes under /api/...",
+    "templates/index.html + static/app.js: the page and the fetch() calls to the API",
+    "tests/test_app.py: API tests using Flask's test client"
+  ],
+  "build_steps": [
+    {"name": "Create virtualenv", "cmd": ["{python}", "-m", "venv", ".venv"]},
+    {"name": "Install dependencies", "cmd": ["{venv_python}", "-m", "pip", "install", "--disable-pip-version-check", "-q", "-r", "requirements.txt"]},
+    {"name": "Tests", "cmd": ["{venv_python}", "-m", "unittest", "discover", "-s", "tests", "-t", "."]}
+  ],
+  "build_outputs": []
+}

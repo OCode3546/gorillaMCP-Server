@@ -215,6 +215,14 @@ def run_agent_tool(agent_name: str, goal: str, targets: list[str] | None = None,
     """Run an agent with a task objective and optional target paths (relative to the workspace root).
 
     Agent-specific fields go in `extra`:
+    - agent-builder (code generator for web apps, APIs, desktop apps/executables, games, CLIs):
+      mode ("plan" = dry run, the default; "generate" writes the project; "build" installs deps,
+      runs tests and packages it; "templates" lists templates). Optional template (web-static,
+      web-react, web-flask, api-fastapi, desktop-tkinter, desktop-electron, game-html5, game-pygame,
+      cli-python; otherwise chosen from the goal), name, title, description, destination (exact
+      project folder, absolute or ~), overwrite, build (build right after generate), project
+      (folder for build mode). targets[0], if given, is the parent folder for the new project.
+      After generating, customise the code for the goal before building.
     - code-errors-agent: needs at least one of error_message, stack_trace, code_snippet;
       optional test_command (a shell command run to verify), reproduce_steps, expected_behavior.
     - file-sorter-agent: mode ("plan" = dry run, the default; "apply" moves files; "undo" reverts

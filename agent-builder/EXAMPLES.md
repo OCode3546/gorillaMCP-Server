@@ -1,23 +1,23 @@
-# Builder Agent — Example Invoke Prompts
+# Builder Agent: example prompts
 
-Purpose: Short, copy-paste prompts to invoke the workspace-scoped Builder Agent skill.
+Copy-paste goals for `/agent-builder` (or `run_agent_tool` with `agent_name="agent-builder"`). The agent picks the template; name one explicitly with `template` to override.
 
-1. Implement a feature (small)
+| Goal | Template picked |
+| --- | --- |
+| "Build a snake game exe" | `game-pygame` |
+| "Tetris in the browser" | `game-html5` |
+| "A landing page for my bakery" | `web-static` |
+| "React dashboard for sales numbers" | `web-react` |
+| "Flask inventory app with a database" | `web-flask` |
+| "Python API for orders" | `api-fastapi` |
+| "Windows exe that tracks my expenses" | `desktop-tkinter` |
+| "Electron app with an installer for a markdown editor" | `desktop-electron` |
+| "Command line tool to rename photos by date" | `cli-python` |
 
-- Prompt: "Implement a settings page under `src/ui/settings`. Keep changes minimal, add unit tests with pytest, and run only tests impacted by the change. Use project's test runner if present."
+## Typical flow
 
-2) Refactor a module
-
-- Prompt: "Refactor `service/auth.py` to remove duplication and improve readability. Keep behavior identical; add unit tests for any changed logic. Run `ruff` and `pytest`."
-
-3. Lint and fix straightforward issues
-
-- Prompt: "Audit the repository for `ruff`/`flake8` errors and automatically fix trivial style issues. Report any non-trivial warnings for approval."
-
-4. Add a test for a bug
-- Prompt: "Reproduce failing behavior in `tests/test_user_flow.py::test_login` and add a regression test that captures the correct behavior. Run pytest and provide failing output if the bug reproduces."
-
-5) Quick audit before PR
-- Prompt: "Prepare a pre-PR checklist for `feature/new-reports`: lint, run unit tests, run type checks, and list any risky changes that need manual review."
-
-Guidance: include the target file/folder path, desired depth (quick/complete), and whether to run tests or only static checks.
+1. **Plan:** `{"goal": "Build a snake game exe"}` shows the template, folder and file list.
+2. **Generate:** add `"mode": "generate"` (and optionally `"destination": "~/Projects/snake"`).
+3. **Customise:** edit the generated code for the real goal (for the snake game: replace the dodge logic in `main.py` with snake movement and growth).
+4. **Build:** `{"mode": "build", "project": "<project folder>"}` runs tests and packages to `dist/` or `release/`.
+5. **Windows .exe from a Mac:** push to GitHub and run the included **Build executables** workflow.

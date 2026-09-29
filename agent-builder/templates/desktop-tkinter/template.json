@@ -1,0 +1,33 @@
+{
+  "title": "Python desktop app (Tkinter) packaged as an executable",
+  "category": "desktop",
+  "description": "Native-looking desktop GUI using only the Python standard library (Tkinter/ttk): menu bar, sidebar list, editor pane, status bar, JSON persistence and unit-tested logic. Packages into a standalone .exe / .app with PyInstaller.",
+  "stack": ["Python", "Tkinter", "PyInstaller"],
+  "produces": ["Standalone desktop executable: .exe on Windows, .app on macOS, binary on Linux"],
+  "requires": ["python3"],
+  "packages_executable": true,
+  "priority": 40,
+  "default_name": "my-desktop-app",
+  "keywords": ["exe", "executable", "desktop", "tkinter", "gui", "windows app", "mac app", "desktop app"],
+  "hints": ["python", "tool", "utility", "windows", "installer", "offline", "notes", "editor", "manager", "tracker"],
+  "run": [
+    "cd __APP_NAME__ && python3 app.py   (no dependencies needed to run)"
+  ],
+  "build": [
+    "Build mode creates .venv, installs PyInstaller, runs the unit tests and packages the app into dist/",
+    "Windows .exe: run build_exe.bat on Windows, or push to GitHub and download the artifact from the 'Build executables' workflow"
+  ],
+  "customize": [
+    "store.py: the data model and persistence (pure Python, unit-tested in tests/)",
+    "app.py App._build_ui(): widgets and layout; menu in App._build_menu()",
+    "app.py event handlers (on_new, on_save, on_delete, ...) connect the UI to the store"
+  ],
+  "build_steps": [
+    {"name": "Create virtualenv", "cmd": ["{python}", "-m", "venv", ".venv"]},
+    {"name": "Install PyInstaller", "cmd": ["{venv_python}", "-m", "pip", "install", "--disable-pip-version-check", "-q", "-r", "requirements.txt", "pyinstaller"]},
+    {"name": "Unit tests", "cmd": ["{venv_python}", "-m", "unittest", "discover", "-s", "tests", "-t", "."]},
+    {"name": "Package executable", "platforms": ["windows", "linux"], "cmd": ["{venv_python}", "-m", "PyInstaller", "--noconfirm", "--clean", "--onefile", "--windowed", "--name", "__APP_NAME__", "app.py"]},
+    {"name": "Package macOS app", "platforms": ["mac"], "cmd": ["{venv_python}", "-m", "PyInstaller", "--noconfirm", "--clean", "--windowed", "--name", "__APP_NAME__", "app.py"]}
+  ],
+  "build_outputs": ["dist/*"]
+}

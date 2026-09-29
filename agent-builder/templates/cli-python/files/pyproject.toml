@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "__APP_NAME__"
+version = "0.1.0"
+description = "__APP_DESCRIPTION__"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.scripts]
+__APP_NAME__ = "__PKG_NAME__.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

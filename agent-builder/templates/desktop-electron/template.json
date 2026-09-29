@@ -1,0 +1,33 @@
+{
+  "title": "Desktop app (Electron) with installers",
+  "category": "desktop",
+  "description": "Cross-platform Electron desktop app using web tech: secure main/preload/renderer split (context isolation, IPC), native save dialog, and electron-builder packaging into a Windows installer + portable .exe, macOS .dmg and Linux AppImage.",
+  "stack": ["Electron", "HTML/CSS/JavaScript", "electron-builder"],
+  "produces": ["Windows NSIS installer + portable .exe", "macOS .dmg", "Linux AppImage"],
+  "requires": ["node", "npm"],
+  "packages_executable": true,
+  "priority": 45,
+  "default_name": "my-desktop-app",
+  "keywords": ["electron", "desktop web", "cross-platform desktop", "installer"],
+  "hints": ["exe", "executable", "desktop", "desktop app", "windows", "javascript", "node", "html", "cross-platform", "dmg"],
+  "run": [
+    "cd __APP_NAME__ && npm install",
+    "npm start"
+  ],
+  "build": [
+    "Build mode runs npm install and npm run dist, packaging for the current OS into release/",
+    "Windows .exe/installer: run `npm run dist:win` on Windows, or push to GitHub and use the 'Build executables' workflow"
+  ],
+  "customize": [
+    "src/index.html, src/renderer.js, src/styles.css: the UI (plain web code)",
+    "main.js: window creation, menus and ipcMain handlers for anything needing Node/OS access",
+    "preload.js: the only bridge between UI and main; expose new functions on window.api here",
+    "package.json \"build\": app id, product name, icons and installer targets"
+  ],
+  "build_env": {"CSC_IDENTITY_AUTO_DISCOVERY": "false"},
+  "build_steps": [
+    {"name": "Install dependencies", "cmd": ["{npm}", "install", "--no-audit", "--no-fund"]},
+    {"name": "Package for this OS", "cmd": ["{npm}", "run", "dist"]}
+  ],
+  "build_outputs": ["release/*.exe", "release/*.dmg", "release/*.AppImage", "release/*.zip"]
+}

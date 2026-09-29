@@ -1,0 +1,28 @@
+{
+  "title": "REST API (Python FastAPI)",
+  "category": "api",
+  "description": "FastAPI service with typed Pydantic models, CRUD endpoints, validation, automatic OpenAPI docs at /docs and tests.",
+  "stack": ["Python", "FastAPI", "Pydantic", "Uvicorn"],
+  "produces": ["HTTP JSON API with interactive docs; deployable to any Python host or container"],
+  "requires": ["python3"],
+  "priority": 70,
+  "default_name": "my-api",
+  "keywords": ["api", "rest api", "fastapi", "backend", "microservice", "endpoint", "web service"],
+  "hints": ["python", "server", "json", "http", "service", "webhook"],
+  "run": [
+    "cd __APP_NAME__ && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt",
+    ".venv/bin/uvicorn main:app --reload   then open http://127.0.0.1:8000/docs"
+  ],
+  "build": ["Build mode creates .venv, installs dependencies and runs the tests."],
+  "customize": [
+    "models.py: request/response schemas",
+    "main.py: routes; swap the in-memory Repository for a database when needed",
+    "tests/test_api.py: tests using FastAPI's TestClient"
+  ],
+  "build_steps": [
+    {"name": "Create virtualenv", "cmd": ["{python}", "-m", "venv", ".venv"]},
+    {"name": "Install dependencies", "cmd": ["{venv_python}", "-m", "pip", "install", "--disable-pip-version-check", "-q", "-r", "requirements.txt", "-r", "requirements-dev.txt"]},
+    {"name": "Tests", "cmd": ["{venv_python}", "-m", "unittest", "discover", "-s", "tests", "-t", "."]}
+  ],
+  "build_outputs": []
+}

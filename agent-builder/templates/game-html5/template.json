@@ -1,0 +1,71 @@
+{
+  "title": "Browser game (HTML5 canvas)",
+  "category": "game",
+  "description": "Complete canvas arcade game with no dependencies: game loop with delta time, keyboard/touch input, menu/playing/paused/game-over states, levels, lives and a saved high score.",
+  "stack": [
+    "HTML5 canvas",
+    "JavaScript"
+  ],
+  "produces": [
+    "Game playable in any browser; deployable to itch.io, GitHub Pages or any static host"
+  ],
+  "requires": [],
+  "priority": 20,
+  "default_name": "my-game",
+  "keywords": [
+    "game",
+    "browser game",
+    "html5 game",
+    "canvas",
+    "web game"
+  ],
+  "hints": [
+    "javascript",
+    "web",
+    "snake",
+    "platformer",
+    "shooter",
+    "space",
+    "asteroid",
+    "puzzle",
+    "runner",
+    "breakout",
+    "pong",
+    "dodge",
+    "retro",
+    "2d",
+    "tetris",
+    "flappy",
+    "maze",
+    "chess",
+    "tic-tac-toe",
+    "tictactoe",
+    "memory game",
+    "card game",
+    "rpg",
+    "racing",
+    "clicker",
+    "match-3",
+    "minesweeper",
+    "sudoku",
+    "invaders",
+    "roguelike",
+    "browser",
+    "arcade"
+  ],
+  "run": [
+    "Open __APP_NAME__/index.html in a browser",
+    "Or serve it: cd __APP_NAME__ && python3 -m http.server 8080, then open http://localhost:8080"
+  ],
+  "build": [
+    "No build step: zip the folder for itch.io (HTML game) or deploy it to any static host."
+  ],
+  "customize": [
+    "game.js CONFIG: canvas size, speeds, spawn rates, lives",
+    "game.js Player / Hazard / Pickup classes: entity behaviour and drawing",
+    "game.js update(dt): rules, collisions and scoring; render(): all drawing",
+    "Swap the vector drawing in each draw() for sprites via ctx.drawImage when adding art"
+  ],
+  "build_steps": [],
+  "build_outputs": []
+}

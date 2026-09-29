@@ -1,0 +1,33 @@
+{
+  "title": "Python command-line tool",
+  "category": "cli",
+  "description": "Installable Python CLI (pyproject, console script, argparse subcommands, JSON output option) with tests, packaged into a single-file executable by PyInstaller.",
+  "stack": ["Python", "argparse", "PyInstaller"],
+  "produces": ["pip-installable package with a console command", "Single-file executable (.exe on Windows)"],
+  "requires": ["python3"],
+  "packages_executable": true,
+  "priority": 50,
+  "default_name": "my-cli",
+  "keywords": ["cli", "command line", "command-line", "terminal", "console", "script", "automation"],
+  "hints": ["python", "tool", "utility", "exe", "batch", "convert", "rename", "parse", "scraper"],
+  "run": [
+    "cd __APP_NAME__ && python3 -m venv .venv && .venv/bin/pip install -e .",
+    ".venv/bin/__APP_NAME__ --help"
+  ],
+  "build": [
+    "Build mode creates .venv, installs the package + PyInstaller, runs the tests and packages dist/__APP_NAME__",
+    "Windows .exe: run build_exe.bat on Windows, or use the 'Build executables' GitHub workflow"
+  ],
+  "customize": [
+    "src/__PKG_NAME__/cli.py build_parser(): add subcommands and options",
+    "src/__PKG_NAME__/core.py: the actual logic, kept free of argparse so it's easy to test",
+    "tests/test_cli.py: tests call main([...]) directly"
+  ],
+  "build_steps": [
+    {"name": "Create virtualenv", "cmd": ["{python}", "-m", "venv", ".venv"]},
+    {"name": "Install package", "cmd": ["{venv_python}", "-m", "pip", "install", "--disable-pip-version-check", "-q", "-e", ".", "pyinstaller"]},
+    {"name": "Unit tests", "cmd": ["{venv_python}", "-m", "unittest", "discover", "-s", "tests", "-t", "."]},
+    {"name": "Package executable", "cmd": ["{venv_python}", "-m", "PyInstaller", "--noconfirm", "--clean", "--onefile", "--name", "__APP_NAME__", "--paths", "src", "run.py"]}
+  ],
+  "build_outputs": ["dist/*"]
+}

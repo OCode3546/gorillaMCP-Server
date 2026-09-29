@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="container">
+    <h1>{{ title }}</h1>
+    <p class="subtitle">{{ description }}</p>
+
+    <form id="add-form" class="add-form" autocomplete="off">
+      <input id="title" type="text" placeholder="Add an item…" aria-label="New item" required>
+      <button type="submit">Add</button>
+    </form>
+
+    <p id="error" class="error" hidden></p>
+    <ul id="items" class="items"></ul>
+  </main>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

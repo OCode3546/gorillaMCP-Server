@@ -1,0 +1,149 @@
+{
+  "title": "Python game (pygame) packaged as an executable",
+  "category": "game",
+  "description": "Complete pygame-ce arcade game (states, levels, lives, high score) with a headless smoke test and PyInstaller packaging into a standalone .exe / .app / Linux binary.",
+  "stack": [
+    "Python",
+    "pygame-ce",
+    "PyInstaller"
+  ],
+  "produces": [
+    "Standalone game executable: .exe on Windows, .app on macOS, binary on Linux"
+  ],
+  "requires": [
+    "python3"
+  ],
+  "packages_executable": true,
+  "priority": 30,
+  "default_name": "my-game",
+  "keywords": [
+    "pygame",
+    "python game",
+    "game"
+  ],
+  "hints": [
+    "python",
+    "exe",
+    "executable",
+    "desktop",
+    "windows",
+    "snake",
+    "platformer",
+    "shooter",
+    "space",
+    "asteroid",
+    "puzzle",
+    "runner",
+    "arcade",
+    "2d",
+    "tetris",
+    "pong",
+    "breakout",
+    "flappy",
+    "maze",
+    "chess",
+    "tic-tac-toe",
+    "tictactoe",
+    "memory game",
+    "card game",
+    "rpg",
+    "racing",
+    "clicker",
+    "match-3",
+    "minesweeper",
+    "sudoku",
+    "invaders",
+    "roguelike"
+  ],
+  "run": [
+    "cd __APP_NAME__ && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt",
+    ".venv/bin/python main.py"
+  ],
+  "build": [
+    "Build mode creates .venv, installs pygame-ce + PyInstaller, runs a headless smoke test and packages the game into dist/",
+    "Windows .exe: run build_exe.bat on Windows, or push to GitHub and download the artifact from the 'Build executables' workflow"
+  ],
+  "customize": [
+    "settings.py: window size, speeds, spawn rates, colours",
+    "main.py Player / Hazard / Pickup classes: entity behaviour and drawing",
+    "main.py Game.update(dt) and Game.draw(): rules, collisions, scoring, rendering",
+    "Load art with pygame.image.load() and ship assets via PyInstaller --add-data"
+  ],
+  "build_env": {
+    "SDL_VIDEODRIVER": "dummy",
+    "SDL_AUDIODRIVER": "dummy",
+    "PYGAME_HIDE_SUPPORT_PROMPT": "1"
+  },
+  "build_steps": [
+    {
+      "name": "Create virtualenv",
+      "cmd": [
+        "{python}",
+        "-m",
+        "venv",
+        ".venv"
+      ]
+    },
+    {
+      "name": "Install dependencies",
+      "cmd": [
+        "{venv_python}",
+        "-m",
+        "pip",
+        "install",
+        "--disable-pip-version-check",
+        "-q",
+        "-r",
+        "requirements.txt",
+        "pyinstaller"
+      ]
+    },
+    {
+      "name": "Smoke test (headless)",
+      "cmd": [
+        "{venv_python}",
+        "main.py",
+        "--smoke-test"
+      ]
+    },
+    {
+      "name": "Package executable",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "cmd": [
+        "{venv_python}",
+        "-m",
+        "PyInstaller",
+        "--noconfirm",
+        "--clean",
+        "--onefile",
+        "--windowed",
+        "--name",
+        "__APP_NAME__",
+        "main.py"
+      ]
+    },
+    {
+      "name": "Package macOS app",
+      "platforms": [
+        "mac"
+      ],
+      "cmd": [
+        "{venv_python}",
+        "-m",
+        "PyInstaller",
+        "--noconfirm",
+        "--clean",
+        "--windowed",
+        "--name",
+        "__APP_NAME__",
+        "main.py"
+      ]
+    }
+  ],
+  "build_outputs": [
+    "dist/*"
+  ]
+}
