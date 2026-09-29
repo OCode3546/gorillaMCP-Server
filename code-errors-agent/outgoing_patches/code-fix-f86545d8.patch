@@ -1,0 +1,39 @@
+# Code Error Diagnostic Report
+
+## ISSUE SUMMARY
+Goal: Fix ZeroDivisionError
+
+## DIAGNOSIS
+
+**Error Type:** ZeroDivisionError
+**Error Message:** ZeroDivisionError: float division by zero
+
+
+## ROOT CAUSE ANALYSIS
+
+Based on the error type and available context, likely causes:
+1. Add zero check before division
+2. Validate denominators
+
+## SUGGESTED FIXES
+- Add denominator check before division
+- Handle zero case separately
+- Use try/except for division
+- Validate divisor is non-zero
+
+## CODE SNIPPET
+```
+discount_rate = total_discount / subtotal
+```
+
+## EXPECTED BEHAVIOR
+
+
+## REPRODUCTION STEPS
+None provided
+
+## NEXT ACTIONS
+1. Review the suggested fixes above
+2. Apply the most relevant fix to your code
+3. Run the test/verification command
+4. Verify the fix resolves the issue

@@ -1,0 +1,11 @@
+{
+  "servers": {
+    "workspace-agent-registry": {
+      "type": "http",
+      "url": "https://example.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${MCP_API_KEY}"
+      }
+    }
+  }
+}

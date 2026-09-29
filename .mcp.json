@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "workspace-agent-registry": {
+      "type": "stdio",
+      "command": "/Users/codegorilla03/Documents/Agents & MCP Server /.venv/bin/python",
+      "args": [
+        "/Users/codegorilla03/Documents/Agents & MCP Server /mcp_server.py",
+        "--transport",
+        "stdio"
+      ]
+    }
+  }
+}

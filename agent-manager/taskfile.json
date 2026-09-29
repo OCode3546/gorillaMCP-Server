@@ -1,0 +1,518 @@
+{
+  "manager": {
+    "name": "Task Manager",
+    "description": "Central task orchestrator that routes work requests to specialized agents",
+    "version": "1.1.0"
+  },
+  "agents": {
+    "agent-builder": {
+      "name": "Builder Agent",
+      "role": "Engineer / Specialist",
+      "description": "Handles feature implementation, refactoring, testing, and documentation work",
+      "capabilities": [
+        "implement-feature",
+        "refactor-code",
+        "fix-bugs",
+        "add-tests",
+        "audit-code",
+        "optimize-performance",
+        "write-docs"
+      ],
+      "runner": "run_agent.py"
+    },
+    "file-sorter-agent": {
+      "name": "File Sorter Agent",
+      "role": "Repository Organizer / Analyst",
+      "description": "Organizes files by type, date, or size; groups content and creates workspace reports",
+      "capabilities": [
+        "sort-files",
+        "organize-workspace",
+        "group-by-type",
+        "find-large-files",
+        "generate-organization-report",
+        "suggest-folder-structure"
+      ],
+      "runner": "run_agent.py"
+    },
+    "code-errors-agent": {
+      "name": "Code Errors Agent",
+      "role": "Debugging / Error Resolution",
+      "description": "Analyzes stack traces, runtime exceptions, failing tests, and code snippets to diagnose root causes and suggest fixes",
+      "capabilities": [
+        "debug-errors",
+        "analyze-stack-trace",
+        "classify-exception",
+        "suggest-fixes",
+        "verify-with-tests",
+        "explain-root-cause"
+      ],
+      "runner": "run_agent.py"
+    }
+  },
+  "task_classification": {
+    "feature_development": {
+      "name": "Feature Development",
+      "description": "Building new features and functionality",
+      "assigned_to": "agent-builder",
+      "keywords": [
+        "implement",
+        "create",
+        "build",
+        "add feature",
+        "new capability",
+        "new module"
+      ],
+      "task_template": {
+        "goal": "Implement a new feature",
+        "targets": ["src/"],
+        "requirements": [
+          "Write tests",
+          "Follow existing code patterns",
+          "Document changes"
+        ],
+        "depth": "full"
+      }
+    },
+    "code_quality": {
+      "name": "Code Quality & Refactoring",
+      "description": "Improving code quality, refactoring, and optimization",
+      "assigned_to": "agent-builder",
+      "keywords": [
+        "refactor",
+        "optimize",
+        "improve",
+        "cleanup",
+        "restructure",
+        "simplify",
+        "reduce duplication",
+        "dry principles"
+      ],
+      "task_template": {
+        "goal": "Refactor code for clarity and performance",
+        "targets": ["src/"],
+        "requirements": [
+          "Preserve existing behavior",
+          "Add tests for changed logic",
+          "Run linters and tests"
+        ],
+        "depth": "full"
+      }
+    },
+    "bug_fix": {
+      "name": "Bug Fixes",
+      "description": "Fixing bugs and issues in existing code",
+      "assigned_to": "code-errors-agent",
+      "keywords": [
+        "fix bug",
+        "fix issue",
+        "resolve",
+        "broken",
+        "error",
+        "crash",
+        "not working",
+        "defect",
+        "regression"
+      ],
+      "task_template": {
+        "goal": "Fix reported bug",
+        "targets": ["src/"],
+        "requirements": [
+          "Reproduce the issue",
+          "Add regression test",
+          "Verify fix works",
+          "No side effects"
+        ],
+        "depth": "full"
+      }
+    },
+    "file_organization": {
+      "name": "File Organization & Cleanup",
+      "description": "Sorting, grouping, and organizing files into sensible structures",
+      "assigned_to": "file-sorter-agent",
+      "keywords": [
+        "sort files",
+        "organize files",
+        "group files",
+        "clean workspace",
+        "file cleanup",
+        "organize directory",
+        "find large files",
+        "move files",
+        "archive files"
+      ],
+      "task_template": {
+        "goal": "Organize files in the target directory",
+        "targets": ["./"],
+        "sort_by": "type",
+        "generate_report": true,
+        "create_structure": true,
+        "requirements": [
+          "Review file categories",
+          "Group by type, date, or size",
+          "Create a summary report",
+          "Suggest folder structure"
+        ],
+        "depth": "full"
+      }
+    },
+    "debugging": {
+      "name": "Debugging & Error Resolution",
+      "description": "Investigating stack traces, exceptions, and failing runtime behavior",
+      "assigned_to": "code-errors-agent",
+      "keywords": [
+        "debug",
+        "traceback",
+        "stack trace",
+        "runtime error",
+        "exception",
+        "syntax error",
+        "failing test",
+        "typeerror",
+        "attributeerror",
+        "zerodivisionerror",
+        "error message",
+        "why is this failing"
+      ],
+      "task_template": {
+        "goal": "Diagnose and fix the reported code issue",
+        "targets": ["src/", "tests/"],
+        "requirements": [
+          "Collect the error message or stack trace",
+          "Identify the root cause",
+          "Implement the smallest safe fix",
+          "Verify with available tests or reproduction"
+        ],
+        "depth": "full"
+      }
+    },
+    "testing": {
+      "name": "Testing & QA",
+      "description": "Adding tests, improving test coverage, and QA",
+      "assigned_to": "agent-builder",
+      "keywords": [
+        "add tests",
+        "test coverage",
+        "unit test",
+        "integration test",
+        "test edge cases",
+        "qa",
+        "quality assurance"
+      ],
+      "task_template": {
+        "goal": "Add comprehensive tests",
+        "targets": ["src/", "tests/"],
+        "requirements": [
+          "Cover edge cases",
+          "Test error conditions",
+          "Achieve >80% coverage",
+          "Run full test suite"
+        ],
+        "depth": "full"
+      }
+    },
+    "code_review": {
+      "name": "Code Review & Audit",
+      "description": "Reviewing code quality, security, and best practices",
+      "assigned_to": "agent-builder",
+      "keywords": [
+        "audit",
+        "review",
+        "check",
+        "inspect",
+        "security",
+        "best practices",
+        "pre-pr",
+        "code review"
+      ],
+      "task_template": {
+        "goal": "Audit code for quality and best practices",
+        "targets": ["src/"],
+        "requirements": [
+          "Run linters",
+          "Check type safety",
+          "Identify risky patterns",
+          "Report findings"
+        ],
+        "depth": "full"
+      }
+    },
+    "documentation": {
+      "name": "Documentation",
+      "description": "Writing and improving documentation",
+      "assigned_to": "agent-builder",
+      "keywords": [
+        "document",
+        "write docs",
+        "readme",
+        "comments",
+        "docstring",
+        "api docs",
+        "documentation"
+      ],
+      "task_template": {
+        "goal": "Create or improve documentation",
+        "targets": ["docs/", "README.md"],
+        "requirements": [
+          "Clear examples",
+          "Complete coverage",
+          "Proofread"
+        ],
+        "depth": "full"
+      }
+    }
+  },
+  "routing_rules": {
+    "priority_keywords": [
+      {
+        "pattern": "sort files|organize files|group files|clean workspace|find large files|move files",
+        "category": "file_organization"
+      },
+      {
+        "pattern": "debug|traceback|stack trace|runtime error|exception|failing test|typeerror|attributeerror|zerodivisionerror",
+        "category": "debugging"
+      },
+      {
+        "pattern": "implement|create|build|add (feature|function|method)",
+        "category": "feature_development"
+      },
+      {
+        "pattern": "refactor|optimize|improve|cleanup|reduce duplication",
+        "category": "code_quality"
+      },
+      {
+        "pattern": "fix (bug|issue|error)|broken|crash|not working|defect|regression",
+        "category": "bug_fix"
+      },
+      {
+        "pattern": "test|unit test|integration test|test coverage|quality assurance",
+        "category": "testing"
+      },
+      {
+        "pattern": "audit|review|check|inspect|security|pre-pr|code review",
+        "category": "code_review"
+      },
+      {
+        "pattern": "document|write docs|readme|comment|documentation",
+        "category": "documentation"
+      }
+    ]
+  },
+  "workflow": {
+    "steps": [
+      {
+        "step": 1,
+        "name": "User Input",
+        "actor": "User",
+        "description": "User provides task description to the manager"
+      },
+      {
+        "step": 2,
+        "name": "Task Classification",
+        "actor": "Manager",
+        "description": "Manager analyzes task and determines category based on keywords and context"
+      },
+      {
+        "step": 3,
+        "name": "Agent Assignment",
+        "actor": "Manager",
+        "description": "Manager routes task to the appropriate agent based on classification"
+      },
+      {
+        "step": 4,
+        "name": "Task Execution",
+        "actor": "Agent",
+        "description": "Assigned agent executes task with specified requirements and depth"
+      },
+      {
+        "step": 5,
+        "name": "Results & Artifacts",
+        "actor": "Agent",
+        "description": "Agent returns results, patches, and artifacts for review"
+      },
+      {
+        "step": 6,
+        "name": "User Review",
+        "actor": "User",
+        "description": "User reviews artifacts and decides on approval/rejection"
+      }
+    ]
+  },
+  "task_examples": {
+    "feature_request": {
+      "user_prompt": "I need to implement a new user authentication module with login and signup endpoints",
+      "classification": "feature_development",
+      "assigned_agent": "agent-builder",
+      "structured_task": {
+        "goal": "Implement user authentication module with login and signup endpoints",
+        "targets": ["src/auth/", "src/api/"],
+        "requirements": [
+          "Add comprehensive error handling",
+          "Include unit tests for all endpoints",
+          "Follow existing API patterns",
+          "Document API endpoints",
+          "Add security best practices"
+        ],
+        "depth": "full",
+        "checks": ["lint", "test", "type-check"]
+      }
+    },
+    "bug_fix_request": {
+      "user_prompt": "There's a bug where users can't reset their password. The reset email never gets sent.",
+      "classification": "bug_fix",
+      "assigned_agent": "code-errors-agent",
+      "structured_task": {
+        "goal": "Fix password reset email delivery issue",
+        "targets": ["src/auth/", "src/email/"],
+        "requirements": [
+          "Reproduce the bug with test case",
+          "Identify root cause",
+          "Implement fix",
+          "Add regression test",
+          "Verify fix works end-to-end"
+        ],
+        "depth": "full",
+        "checks": ["test", "email-integration-test"]
+      }
+    },
+    "debugging_request": {
+      "user_prompt": "The app crashes with a TypeError in the login flow after the user submits the form. We need the stack trace analyzed and fixed.",
+      "classification": "debugging",
+      "assigned_agent": "code-errors-agent",
+      "structured_task": {
+        "goal": "Diagnose and fix the login TypeError in the user submission flow",
+        "targets": ["src/auth/", "tests/auth/"],
+        "requirements": [
+          "Review the stack trace and error message",
+          "Identify the null or wrong-type value causing the crash",
+          "Apply a minimal safe fix",
+          "Verify with the app or failing test"
+        ],
+        "depth": "full",
+        "checks": ["test", "stack-trace-analysis"]
+      }
+    },
+    "file_sort_request": {
+      "user_prompt": "Please sort the project files into sensible folders and group them by type so the workspace is easier to navigate.",
+      "classification": "file_organization",
+      "assigned_agent": "file-sorter-agent",
+      "structured_task": {
+        "goal": "Organize the workspace into a sensible folder structure by file type",
+        "targets": ["./"],
+        "sort_by": "type",
+        "generate_report": true,
+        "create_structure": true,
+        "requirements": [
+          "Categorize files by type",
+          "Group related files together",
+          "Generate summary statistics",
+          "Recommend a target folder layout"
+        ],
+        "depth": "full",
+        "checks": ["organization-report"]
+      }
+    },
+    "refactoring_request": {
+      "user_prompt": "The database module has a lot of duplicate connection handling code. Let's refactor it for DRY principles.",
+      "classification": "code_quality",
+      "assigned_agent": "agent-builder",
+      "structured_task": {
+        "goal": "Refactor database module to eliminate duplication",
+        "targets": ["src/db/"],
+        "requirements": [
+          "Preserve existing behavior",
+          "Extract common patterns into shared functions",
+          "Add unit tests for refactored code",
+          "Run full test suite to verify no regressions",
+          "Update documentation"
+        ],
+        "depth": "full",
+        "checks": ["lint", "test"]
+      }
+    },
+    "test_coverage_request": {
+      "user_prompt": "The payment processing module needs better test coverage. Add tests for edge cases and error scenarios.",
+      "classification": "testing",
+      "assigned_agent": "agent-builder",
+      "structured_task": {
+        "goal": "Improve test coverage for payment processing module",
+        "targets": ["src/payment/", "tests/test_payment/"],
+        "requirements": [
+          "Add tests for all payment methods",
+          "Test edge cases (invalid amounts, timeout scenarios)",
+          "Test error conditions (payment failures, network issues)",
+          "Achieve >90% code coverage",
+          "Document test scenarios"
+        ],
+        "depth": "full",
+        "checks": ["test", "coverage"]
+      }
+    },
+    "code_review_request": {
+      "user_prompt": "Can you audit the API handler code for security issues and best practices before we merge the feature branch?",
+      "classification": "code_review",
+      "assigned_agent": "agent-builder",
+      "structured_task": {
+        "goal": "Security and best practices audit of API handler code",
+        "targets": ["src/api/handlers/"],
+        "requirements": [
+          "Check for injection vulnerabilities",
+          "Verify input validation",
+          "Ensure proper error handling",
+          "Check auth/permissions",
+          "Run security linters",
+          "Report critical vs. minor issues"
+        ],
+        "depth": "full",
+        "checks": ["lint", "security-audit", "type-check"]
+      }
+    }
+  },
+  "task_priority_levels": {
+    "critical": {
+      "level": 1,
+      "description": "Breaks production, security vulnerability, data loss risk",
+      "sla": "Immediate",
+      "keywords": ["critical", "urgent", "production down", "security breach"]
+    },
+    "high": {
+      "level": 2,
+      "description": "Significant impact on functionality or user experience",
+      "sla": "Within 24 hours",
+      "keywords": ["important", "high priority", "major bug"]
+    },
+    "medium": {
+      "level": 3,
+      "description": "Regular feature development and improvements",
+      "sla": "Within 1 week",
+      "keywords": ["medium", "normal", "routine"]
+    },
+    "low": {
+      "level": 4,
+      "description": "Nice-to-have improvements, tech debt, documentation",
+      "sla": "When available",
+      "keywords": ["low priority", "nice-to-have", "tech debt"]
+    }
+  },
+  "manager_decision_logic": {
+    "input_analysis": "Manager reads user prompt and extracts key information: what needs to be done, where, and why",
+    "category_matching": "Manager matches keywords against priority_keywords in routing_rules to determine task category",
+    "agent_selection": "Manager selects appropriate agent based on task_classification",
+    "task_structuring": "Manager structures unstructured user input into formal task JSON with goal, targets, requirements",
+    "execution": "Manager invokes selected agent with structured task",
+    "output_handling": "Manager collects agent output (status, plan, artifacts) and presents to user for review"
+  },
+  "conversation_flow": {
+    "manager_to_user": [
+      "I've received your request. Let me analyze and route this appropriately...",
+      "Task Category: {category}",
+      "Assigning to: {agent_name}",
+      "Here's what {agent_name} will do: {plan}",
+      "Awaiting approval to proceed..."
+    ],
+    "status_updates": [
+      "Working on {goal}...",
+      "Completed {step}",
+      "Artifacts ready for review at {path}"
+    ]
+  }
+}
